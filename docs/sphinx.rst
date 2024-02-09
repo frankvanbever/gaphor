@@ -83,6 +83,14 @@ Step 2: Add references to models
 
 Now include ``diagram`` directives in your documents.
 
+Optionally you can configure Gaphor to make the generated diagrams links to the
+images. This might make sense if you have large diagrams that become unreadable
+due to the constraints of your Sphinx theme. To enable this feature set
+``gaphor_diagram_links`` to true:
+
+.. code:: python
+
+   gaphor_diagram_links = True
 
 Read the Docs
 ~~~~~~~~~~~~~
