@@ -21,6 +21,7 @@ log = logging.getLogger(__name__)
 def setup(app: sphinx.application.Sphinx) -> dict[str, object]:
     """Called by Sphinx to set up the extension."""
     app.add_config_value("gaphor_models", {}, "env", [dict])
+    app.add_config_value("gaphor_diagram_links", False, "html", [bool])
 
     app.add_directive("diagram", DiagramDirective)
 
@@ -35,6 +36,7 @@ def setup(app: sphinx.application.Sphinx) -> dict[str, object]:
 
 def config_inited(app, config):
     log.info(f"Gaphor models: {config.gaphor_models}")
+    log.info(f"Gaphor clickable diagrams: {config.gaphor_diagram_links}")
     if isinstance(config.gaphor_models, str):
         config.gaphor_models = {"default": config.gaphor_models}
 
@@ -102,9 +104,21 @@ class DiagramDirective(sphinx.util.docutils.SphinxDirective):
             outfile = Path("..") / outfile
 
         nodes.header()
-        return [
-            nodes.image(rawsource=self.block_text, uri=f"{outfile}.*", **self.options)
-        ]
+
+        output: list[nodes.Node] = []
+        image_node = nodes.image(
+            rawsource=self.block_text, uri=f"{outfile}.*", **self.options
+        )
+
+        if self.config.gaphor_diagram_links:
+            image_path = f"_images/{diagram.id}.svg"
+            reference_node = nodes.reference(refuri=image_path)
+            reference_node += image_node
+            output = [reference_node]
+        else:
+            output = [image_node]
+
+        return output
 
     def logging_error_node(self, text: str) -> list[nodes.Node]:
         location = self.state_machine.get_source_and_line(self.lineno)

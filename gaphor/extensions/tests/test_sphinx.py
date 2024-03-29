@@ -27,8 +27,11 @@ def test_setup(tmp_path):
 
 
 def test_setup_load_models(tmp_path):
+    config = "gaphor_models = {'style-sheets': 'style-sheet-examples.gaphor'}\n"
+    config += "gaphor_diagram_links = True"
+
     (tmp_path / "conf.py").write_text(
-        "gaphor_models = {'style-sheets': 'style-sheet-examples.gaphor'}",
+        config,
         encoding="utf-8",
     )
     gen = sphinx.application.Sphinx(
