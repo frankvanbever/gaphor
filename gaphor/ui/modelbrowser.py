@@ -75,6 +75,7 @@ class ModelBrowser(UIComponent, ActionProvider):
             self.event_manager,
             self.modeling_language,
             model.template,
+            self.component_registry,
         )
         self.tree_view = Gtk.ListView.new(self.selection, factory)
         self.tree_view.set_vexpand(True)
@@ -407,7 +408,7 @@ def toplevel_popup_model(modeling_language) -> Gio.Menu:
 
 def list_item_factory_setup(
     _factory, list_item, selection, event_manager, modeling_language, template
-):
+        , component_registry):
     builder = Gtk.Builder()
     builder.set_current_object(list_item)
     builder.extend_with_template(
@@ -437,11 +438,11 @@ def list_item_factory_setup(
 
         if not row.menu:
             row.menu = Gtk.PopoverMenu.new_from_model(
-                popup_model(element, modeling_language)
+                popup_model(element, modeling_language, component_registry)
             )
             row.menu.set_parent(row)
         else:
-            row.menu.set_menu_model(popup_model(element, modeling_language))
+            row.menu.set_menu_model(popup_model(element, modeling_language, component_registry))
         row.menu.popup()
 
     ctrl = Gtk.GestureClick.new()
@@ -563,8 +564,12 @@ def list_item_drop_drop(
     return True
 
 
-def popup_model(element, modeling_language):
-    model = Gio.Menu.new()
+def popup_model(element, modeling_language, component_registry):
+    #model = Gio.Menu.new()
+    #print(component_registry)
+
+    model = component_registry.get_service("element_menu").menu
+    print(model)
 
     part = Gio.Menu.new()
 
