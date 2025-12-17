@@ -10,6 +10,7 @@ from gaphas.tool.rubberband import RubberbandPainter, RubberbandState
 from gaphas.view import GtkView
 from gi.repository import Adw, Gdk, GdkPixbuf, Gio, GLib, Gtk
 
+from gaphor.abc import ActionProvider
 from gaphor.core import event_handler, gettext
 from gaphor.core.modeling import StyleSheet
 from gaphor.core.modeling.diagram import StyledDiagram
@@ -31,6 +32,7 @@ from gaphor.i18n import translated_ui_string
 from gaphor.transaction import Transaction
 from gaphor.ui.actiongroup import apply_action_group
 from gaphor.ui.clipboard import Clipboard
+from gaphor.ui.contextmenu import context_menu  # Import the new function
 from gaphor.ui.event import ToolSelected
 
 log = logging.getLogger(__name__)
@@ -84,7 +86,7 @@ def get_placement_cursor(display, icon_name):
     return Gdk.Cursor.new_from_texture(get_placement_icon(display, icon_name), 1, 1)
 
 
-class DiagramPage:
+class DiagramPage(ActionProvider):
     def __init__(self, diagram, event_manager, element_factory, modeling_language):
         self.event_manager = event_manager
         self.element_factory = element_factory
@@ -377,9 +379,15 @@ def popup_model(element):
         gettext("Show in Model Browser"),
         "win.show-in-model-browser",
     )
+
     menu_item.set_attribute_value("target", GLib.Variant.new_string(element.id))
 
     part.append_item(menu_item)
+
+    # Updated to use the generic context_menu function
+    for item in context_menu(element):
+        part.append_item(item)
+
     model.append_section(None, part)
 
     return model

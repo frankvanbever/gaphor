@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from gi.repository import Gdk, Gio, GLib, GObject, Gtk
 
 from gaphor.abc import ActionProvider, TreeItem, TreeModel
@@ -24,6 +26,8 @@ from gaphor.ui.event import (
 from gaphor.ui.treesearch import search, sorted_tree_walker
 
 START_EDIT_DELAY = 100  # ms
+
+log = logging.getLogger(__name__)
 
 
 class ModelBrowser(UIComponent, ActionProvider):
@@ -249,6 +253,19 @@ class ModelBrowser(UIComponent, ActionProvider):
     def show_in_model_browser(self, id: str):
         if element := self.element_factory.lookup(id):
             self.select_element(element)
+
+    @action(name="win.franks-action")
+    def franks_action(self):
+        log.debug("Frank Was Here")
+
+    @action(name="win.harmony-action")
+    def harmony_action(self):
+        log.debug("Harmony package creation triggered!")
+
+    @action(name="win.log-name-action")
+    def log_name_action(self):
+        # In a real scenario, you'd get the element from the context
+        log.debug("Logging name action triggered!")
 
     @event_handler(DiagramSelectionChanged)
     def on_diagram_selection_changed(self, event):
